@@ -6,7 +6,7 @@ MPI + CUDA integration example for hybrid computing.
 * Jesús Jorge Serrano - UPM (j.jorge@alumnos.upm.es)
 
 # Introduction
-This is the Computer Engineering Final Project that want to implement multiple parallel algorithms examples using the hybrid computing paradigm. In this project we will use the General Purpouse CPUs parallel computing paradigm (using MPI) and Graphics GPUs (Using CUDA), providing an cluster of GPUs connected using MPI and a local network.
+This is a Computer Engineering Final Project that want to implement multiple parallel algorithms examples using the hybrid computing paradigm. In this project we will use the General Purpouse CPUs parallel computing paradigm (using MPI) and Graphics GPUs (Using CUDA), providing an cluster of GPUs connected using MPI and a local network.
 
 ## Getting Started
 
