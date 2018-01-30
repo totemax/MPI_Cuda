@@ -1,3 +1,5 @@
+hostf
+
 # Prerequisites
 *.d
 
@@ -11,6 +13,7 @@
 *.ilk
 *.map
 *.exp
+bin/*
 
 # Precompiled Headers
 *.gch

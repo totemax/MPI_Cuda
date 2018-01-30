@@ -4,6 +4,7 @@ MPI + CUDA integration example for hybrid computing.
 # Author
 
 * Jesús Jorge Serrano - UPM (j.jorge@alumnos.upm.es)
+* Plano2D and Mapapixel modules developed by Pablo Carazo
 
 # Introduction
 This is a Computer Engineering Final Project that want to implement multiple parallel algorithms examples using the hybrid computing paradigm. In this project we will use the General Purpouse CPUs parallel computing paradigm (using MPI) and Graphics GPUs (Using CUDA), providing an cluster of GPUs connected using MPI and a local network.
