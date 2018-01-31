@@ -3,7 +3,7 @@ LD		= /usr/local/mpich-1.2.7/bin/mpicc
 NVCC	= /usr/local/cuda/bin/nvcc
 
 
-	CCFLAGS 		= -c `pkg-config --cflags gtk+-2.0`
+CCFLAGS 		= -c `pkg-config --cflags gtk+-2.0`
 NVCCFLAGS 	= -c -Wno-deprecated-gpu-targets -gencode arch=compute_30,code=sm_30 -gencode arch=compute_32,code=sm_32 --ptxas-options=-v -D__CUDA_SHARED_MEM__
 LDFLAGS			= -L/usr/local/cuda/lib -lcuda -lcudart -Wl,-rpath,/usr/local/cuda/lib -lstdc++ -lm `pkg-config --libs gtk+-2.0`
 
