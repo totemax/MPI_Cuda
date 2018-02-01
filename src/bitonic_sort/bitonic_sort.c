@@ -1,4 +1,5 @@
 #include "mpi.h"
+#include "GPU.h"
 
 #include <sys/time.h>
 
@@ -12,9 +13,10 @@ static void master(int num_itms);
 static void slave();
 
 unsigned int num_slaves, num_proc;
+int num_itms;
 
 int main(int argc, char **argv){
-    int num_itms, max_int = 0;
+    int max_int = 0;
 
     unsigned char hostname[200];
     unsigned int len;
@@ -34,7 +36,7 @@ int main(int argc, char **argv){
     max_int = num_itms * 2;
 
     if(!num_proc){
-        master(num_itms);
+        master();
     }else{
         slave();
     }
@@ -53,7 +55,7 @@ static void print_result(int *vect, int num_itms){
     printf("]\n");
 }
 
-static void master(int num_itms){
+static void master(){
     int *vect = malloc(num_itms * sizeof(int));
     int *results[4];
     MPI_Status status;
@@ -99,4 +101,13 @@ static void master(int num_itms){
     for(int i = 0; i < num_slaves; i++){
         free(results[i]);
     }
+}
+
+int slave(){
+    int items_per_slave = num_itms / num_slaves;
+    int vect* = malloc(sizeof(int) * items_per_slave);
+    MPI_Status status;
+    MPI_Recv(vect, items_per_slave, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+    bitonic_sort(vect, items_per_slave);
+    MPI_Send(vect, items_per_slave, MPI_INT, 0, 0, MPI_COMM_WORLD);
 }
