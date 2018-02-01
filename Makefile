@@ -28,6 +28,10 @@ mandelbrotMpiLine: $(OBJ)
 	mkdir -p $(BIN_DIR)
 	$(LD) -o $(BIN_DIR)$@ $(OBJ_DIR)mandelbrot_line/*.o $(LDFLAGS)
 
+bitonic_sort: $(OBJ)
+	mkdir -p $(BIN_DIR)
+	$(LD) -o $(BIN_DIR)$@ $(OBJ_DIR)bitonic_sort/*.o $(LDFLAGS)
+
 $(CU_OBJ): $(OBJ_DIR)%.o: $(SRC_DIR)%.cu
 	mkdir -p $(dir $@)
 	$(NVCC) $(NVCCFLAGS) -o $@ $<
