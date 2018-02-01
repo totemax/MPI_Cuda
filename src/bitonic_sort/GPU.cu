@@ -22,13 +22,14 @@ extern "C" {
     void bitonic_sort(int *items, int num_items){
         int num_blocks = num_items / THREADS_PER_BLOCK;
         int *cuda_vect;
-
+        printf("Num blocks: %d\n", num_blocks);
         cudaMalloc((void**)&cuda_vect, sizeof(int) * num_items);
         cudaMemcpy(cuda_vect, items, sizeof(int) * num_items, cudaMemcpyHostToDevice);
-        for(int step = 1; step < (num_items / 2); step *= 2){
+        for(int step = 1; step < (num_items); step *= 2){
             for(int j = step; j > 0; j /= 2){
-                bitonic_kernel<<num_blocks, THREADS_PER_BLOCK>>(cuda_vect, step, j);
-                assert(cudaDeviceSynchronize() == 0);
+                printf("Step: %d, jump: %d\n", step, j);
+                bitonic_kernel<<<num_blocks, THREADS_PER_BLOCK>>>(cuda_vect, step, j);
+                cudaDeviceSynchronize();
             }
         }
         cudaMemcpy(items, cuda_vect, sizeof(int)*num_items, cudaMemcpyDeviceToHost);
