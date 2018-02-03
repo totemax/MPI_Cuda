@@ -24,7 +24,7 @@ extern "C" {
 
     int *init_cuda(int size){
         num_itms = size;
-        #ifdef _CUDA_SHARED_MEM_
+        #ifdef __CUDA_SHARED_MEM__
             cudaMallocManaged(&cuda_Vect, size * sizeof(int));
             return cuda_vect;
         #else
@@ -36,14 +36,14 @@ extern "C" {
 
     void end_cuda(){
         cudaFree(cuda_vect);
-        #ifndef _CUDA_SHARED_MEM_
+        #ifndef __CUDA_SHARED_MEM__
             free(vect);
         #endif
     }
 
     void bitonic_sort(){
         int num_blocks = num_items / THREADS_PER_BLOCK;
-        #ifndef _CUDA_SHARED_MEM_
+        #ifndef __CUDA_SHARED_MEM__
             cudaMemcpy(cuda_vect, vect, sizeof(int) * num_items, cudaMemcpyHostToDevice);
         #endif
         for(int step = 1; step < (num_items); step *= 2){
@@ -53,7 +53,7 @@ extern "C" {
                 cudaDeviceSynchronize();
             }
         }
-        #ifndef _CUDA_SHARED_MEM_
+        #ifndef __CUDA_SHARED_MEM__
             cudaMemcpy(vect, cuda_vect, sizeof(int)*num_items, cudaMemcpyDeviceToHost);
         #endif
     }
