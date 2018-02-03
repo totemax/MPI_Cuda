@@ -29,7 +29,7 @@ extern "C" {
             return cuda_vect;
         #else
             cudaMalloc(&cuda_vect, sizeof(int) * size);
-            vect = malloc(sizeof(int)*size);
+            vect = (int *)malloc(sizeof(int)*size);
             return vect;
         #endif
     }
