@@ -2,6 +2,7 @@
 #include "GPU.h"
 
 #include <time.h>
+#include <sys/time.h>
 
 #include <assert.h>
 #include <stdio.h>
