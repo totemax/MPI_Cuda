@@ -107,10 +107,10 @@ static void master(){
 
 static void slave(){
     int items_per_slave = num_itms / num_slaves;
-    int *vect = (int *)malloc(sizeof(int) * items_per_slave);
+    int *vect = init_cuda(items_per_slave);
     MPI_Status status;
     MPI_Recv(vect, items_per_slave, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-    bitonic_sort(vect, items_per_slave);
-    print_result(vect, items_per_slave);
+    bitonic_sort();
     MPI_Send(vect, items_per_slave, MPI_INT, 0, 0, MPI_COMM_WORLD);
+    end_cuda();
 }

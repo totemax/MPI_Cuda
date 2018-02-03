@@ -6,6 +6,8 @@ extern "C" {
     #include "GPU.h"
 }
 
+int *vect, *cuda_vect, int num_items;
+
 __global__ void bitonic_kernel(int *vect, int step, int jump){
     int itm = (blockIdx.x * blockDim.x) + threadIdx.x;
     int iA = (itm / jump) * jump * 2 + (itm % jump);
@@ -19,12 +21,31 @@ __global__ void bitonic_kernel(int *vect, int step, int jump){
 }
 
 extern "C" {
-    void bitonic_sort(int *items, int num_items){
+
+    int *init_cuda(int size){
+        num_itms = size;
+        #ifdef _CUDA_SHARED_MEM_
+            cudaMallocManaged(&cuda_Vect, size * sizeof(int));
+            return cuda_vect;
+        #else
+            cudaMalloc(&cuda_vect, sizeof(int) * size);
+            vect = malloc(sizeof(int)*size);
+            return vect;
+        #endif
+    }
+
+    void end_cuda(){
+        cudaFree(cuda_vect);
+        #ifndef _CUDA_SHARED_MEM_
+            free(vect);
+        #endif
+    }
+
+    void bitonic_sort(){
         int num_blocks = num_items / THREADS_PER_BLOCK;
-        int *cuda_vect;
-        printf("Num blocks: %d\n", num_blocks);
-        cudaMalloc((void**)&cuda_vect, sizeof(int) * num_items);
-        cudaMemcpy(cuda_vect, items, sizeof(int) * num_items, cudaMemcpyHostToDevice);
+        #ifndef _CUDA_SHARED_MEM_
+            cudaMemcpy(cuda_vect, vect, sizeof(int) * num_items, cudaMemcpyHostToDevice);
+        #endif
         for(int step = 1; step < (num_items); step *= 2){
             for(int j = step; j > 0; j /= 2){
                 printf("Step: %d, jump: %d\n", step, j);
@@ -32,7 +53,8 @@ extern "C" {
                 cudaDeviceSynchronize();
             }
         }
-        cudaMemcpy(items, cuda_vect, sizeof(int)*num_items, cudaMemcpyDeviceToHost);
-        cudaFree(cuda_vect);
+        #ifndef _CUDA_SHARED_MEM_
+            cudaMemcpy(vect, cuda_vect, sizeof(int)*num_items, cudaMemcpyDeviceToHost);
+        #endif
     }
 }

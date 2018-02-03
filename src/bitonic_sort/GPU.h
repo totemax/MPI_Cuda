@@ -3,6 +3,10 @@
 
 #define THREADS_PER_BLOCK 1024
 
-void bitonic_sort(int *items, int num_items);
+void bitonic_sort();
+
+int *init_cuda(int size);
+
+void end_cuda();
 
 #endif
