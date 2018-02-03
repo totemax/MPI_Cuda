@@ -6,7 +6,7 @@ extern "C" {
     #include "GPU.h"
 }
 
-int *vect, *cuda_vect, int num_items;
+int *vect, *cuda_vect, num_items;
 
 __global__ void bitonic_kernel(int *vect, int step, int jump){
     int itm = (blockIdx.x * blockDim.x) + threadIdx.x;
