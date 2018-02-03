@@ -23,9 +23,9 @@ extern "C" {
     int *vect, *cuda_vect, num_items;
 
     int *init_cuda(int size){
-        num_itms = size;
+        num_items = size;
         #ifdef __CUDA_SHARED_MEM__
-            cudaMallocManaged(&cuda_Vect, size * sizeof(int));
+            cudaMallocManaged(&cuda_vect, size * sizeof(int));
             return cuda_vect;
         #else
             cudaMalloc(&cuda_vect, sizeof(int) * size);
