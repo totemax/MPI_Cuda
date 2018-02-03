@@ -4,7 +4,7 @@ NVCC	= /usr/local/cuda/bin/nvcc
 
 
 CCFLAGS 		= -c `pkg-config --cflags gtk+-2.0`
-NVCCFLAGS 	= -ccbin gcc-5 -c -Wno-deprecated-gpu-targets --ptxas-options=-v -D__CUDA_SHARED_MEM__
+NVCCFLAGS 	= -ccbin gcc-5 -c -Wno-deprecated-gpu-targets --ptxas-options=-v
 LDFLAGS			= -L/usr/local/cuda/lib -lcuda -lcudart -Wl,-rpath,/usr/local/cuda/lib -lstdc++ -lm `pkg-config --libs gtk+-2.0`
 
 SRC_DIR			= src/
