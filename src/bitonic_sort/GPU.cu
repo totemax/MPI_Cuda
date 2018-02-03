@@ -48,7 +48,6 @@ extern "C" {
         #endif
         for(int step = 1; step < (num_items); step *= 2){
             for(int j = step; j > 0; j /= 2){
-                printf("Step: %d, jump: %d\n", step, j);
                 bitonic_kernel<<<num_blocks, THREADS_PER_BLOCK>>>(cuda_vect, step, j);
                 cudaDeviceSynchronize();
             }

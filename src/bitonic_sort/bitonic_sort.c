@@ -60,6 +60,7 @@ static void print_result(int *vect, int num_itms){
 static void master(){
     int *vect = malloc(num_itms * sizeof(int));
     int *results[4];
+    struct timeval t0, tf, t;
 
     MPI_Status status;
 
@@ -70,6 +71,7 @@ static void master(){
 
     print_result(vect, num_itms);
 
+    assert (gettimeofday (&t0, NULL) == 0);
     int items_per_slave = num_itms / num_slaves;
     for(int s = 0; s < num_slaves; s++){
         results[s] = (int *)malloc(items_per_slave * sizeof(int));
@@ -97,6 +99,11 @@ static void master(){
         vect[i] = results[min_slave][v_idx[min_slave]];
         v_idx[min_slave]++;
     }
+
+    assert (gettimeofday (&tf, NULL) == 0);
+
+    timersub (&tf, &t0, &t);
+    printf ("\nTiempo total (seg:mseg): %ld:%ld\n", t.tv_sec, t.tv_usec/1000);
 
     print_result(vect, num_itms);
     free(vect);
