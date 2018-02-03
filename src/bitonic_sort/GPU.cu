@@ -6,8 +6,6 @@ extern "C" {
     #include "GPU.h"
 }
 
-int *vect, *cuda_vect, num_items;
-
 __global__ void bitonic_kernel(int *vect, int step, int jump){
     int itm = (blockIdx.x * blockDim.x) + threadIdx.x;
     int iA = (itm / jump) * jump * 2 + (itm % jump);
@@ -21,6 +19,8 @@ __global__ void bitonic_kernel(int *vect, int step, int jump){
 }
 
 extern "C" {
+
+    int *vect, *cuda_vect, num_items;
 
     int *init_cuda(int size){
         num_itms = size;
