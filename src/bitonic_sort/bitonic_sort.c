@@ -70,7 +70,7 @@ static void master(){
         vect[i] = rand() % (num_itms * 2);
     }
 
-    print_result(vect, num_itms);
+    //print_result(vect, num_itms);
 
     assert (gettimeofday (&t0, NULL) == 0);
     int items_per_slave = num_itms / num_slaves;
