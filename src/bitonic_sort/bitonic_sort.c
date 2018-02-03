@@ -106,7 +106,13 @@ static void master(){
     timersub (&tf, &t0, &t);
     printf ("\nTiempo total (seg:mseg): %ld:%ld\n", t.tv_sec, t.tv_usec/1000);
 
-    print_result(vect, num_itms);
+    for(int i = 0; i < num_itms - 1; i++){
+        if(vect[i] > vect[i + 1]){
+            printf("Error de ordenación en item %d\n", i);
+            exit(0);
+        }
+    }
+    printf("Ordenacion OK\n");
     free(vect);
     for(int i = 0; i < num_slaves; i++){
         free(results[i]);
