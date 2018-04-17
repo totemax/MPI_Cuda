@@ -39,10 +39,12 @@ extern "C" {
         #ifndef __CUDA_SHARED_MEM__
             free(vect);
         #endif
+
+        cudaDeviceReset();
     }
 
     void bitonic_sort(){
-        int num_blocks = num_items / THREADS_PER_BLOCK;
+        int num_blocks = (num_items / THREADS_PER_BLOCK) / 2;
         #ifndef __CUDA_SHARED_MEM__
             cudaMemcpy(cuda_vect, vect, sizeof(int) * num_items, cudaMemcpyHostToDevice);
         #endif

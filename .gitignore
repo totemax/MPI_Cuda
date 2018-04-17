@@ -1,4 +1,6 @@
-hostf
+hostf*
+deploy.sh
+reset.sh
 
 # Prerequisites
 *.d
@@ -14,6 +16,7 @@ hostf
 *.map
 *.exp
 bin/*
+obj/*
 
 # Precompiled Headers
 *.gch

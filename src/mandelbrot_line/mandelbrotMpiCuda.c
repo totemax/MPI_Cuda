@@ -32,6 +32,7 @@ void slave(void){
     short row, column, params[3];
     unsigned int *colours;
     struct timeval t0, t1, t;
+    int num_items;
     t_zoom zoom;
     MPI_Status status;
 
@@ -53,7 +54,7 @@ void slave(void){
         }
         planoMapear(IMAGE_WIDTH, IMAGE_HEIGHT, _x_center, _y_center, _height);
         assert (gettimeofday(&t0, NULL) == 0);
-        int num_items = process_mandelbrot(&colours);
+        num_items = process_mandelbrot(&colours);
         assert (gettimeofday(&t1, NULL) == 0);
         timersub(&t1, &t0, &t);
         printf("Finished proccess of machine %d in %ld:%ld (seg:mseg)\n", num_proc, t.tv_sec, t.tv_usec/1000);
