@@ -1,3 +1,9 @@
+/***
+* bitonic_sort_mpi.c
+*
+* Bitonic sort algorithm paralelized over MPI and CUDA (or GPU).
+***/
+
 /*************** INCLUDES ***************/
 #include "mpi.h"
 #include "GPU.h"

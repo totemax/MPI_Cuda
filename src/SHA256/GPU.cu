@@ -211,10 +211,17 @@ __device__ void sha256_final(SHA256_CTX *ctx, BYTE hash[])
 	}
 }
 
+
+/**
+* sha256_cuda_search
+* sha256 search word kernel
+**/
 __global__ void sha256_cuda_search(int num_chars, char *result, unsigned char *search){
-    if(finished){
+    if(finished){ // word found
         return;
     }
+
+    // Generate word asigned to this thread
     BYTE word[32];
     unsigned char digest[32];
     int i, divisor = 1;
@@ -223,11 +230,14 @@ __global__ void sha256_cuda_search(int num_chars, char *result, unsigned char *s
         word[i] = 0x40 + ((conb / divisor) % 64);
         divisor = divisor * 64;
     }
+
+    // Generate SHA
     SHA256_CTX ctx;
     sha256_init(&ctx);
     sha256_update(&ctx, word, num_chars);
     sha256_final(&ctx, digest);
 
+    // Check word
     #pragma unroll 32
     for(i = 0; i < 32; i++){
         if(digest[i] != search[i])
@@ -243,12 +253,19 @@ __global__ void sha256_cuda_search(int num_chars, char *result, unsigned char *s
 
 extern "C" {
 
+    /**
+    * pre_sha256
+    * init SHA data structures.
+    **/
     void pre_sha256() {
         // compy symbols
         checkCudaErrors(cudaMemcpyToSymbol(dev_k, host_k, sizeof(host_k), 0, cudaMemcpyHostToDevice));
     }
 
-
+    /**
+    * find_sha256
+    * CUDA SHA256 decrypt algorithm.
+    **/
     int find_sha256(int num_chars, unsigned char *search, char *result){
         int block_size = BLOCK_SIZE;
         int num_words = pow(NUM_CHARS, num_chars);
@@ -278,6 +295,10 @@ extern "C" {
         }
     }
 
+    /**
+    * end_cuda
+    * deinit cuda
+    **/
     void end_cuda(){
         cudaDeviceReset();
     }

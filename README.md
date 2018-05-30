@@ -7,7 +7,7 @@ MPI + CUDA integration example for hybrid computing.
 * Plano2D and Mapapixel modules developed by Pablo Carazo
 
 # Third parties
-SHA256 module based on previous work of [Matej](https://github.com/Horkyze/CudaSHA256), also based on [CudaMiner by Christian Buchner](https://github.com/cbuchner1/CudaMiner) licensed under GPLv2.
+SHA256 module based on previous work by [Matej](https://github.com/Horkyze/CudaSHA256), also based on [CudaMiner by Christian Buchner](https://github.com/cbuchner1/CudaMiner) licensed under GPLv2.
 
 # Introduction
 This is a Computer Engineering Final Project that want to implement multiple parallel algorithms examples using the hybrid computing paradigm. In this project we will use the General Purpouse CPUs parallel computing paradigm (using MPI) and Graphics GPUs (Using CUDA), providing an cluster of GPUs connected using MPI and a local network.

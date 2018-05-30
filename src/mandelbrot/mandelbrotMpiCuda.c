@@ -1,3 +1,10 @@
+/**
+* mandelbrotMpiCuda.c
+*
+* Mandelbrot fractal drawing program paralelized using MPI and CUDA.
+***/
+
+/*************** INCLUDES ***************/
 #include "mpi.h"
 #include "GPU.h"
 #include "mapapixel.h"
@@ -10,23 +17,26 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**************** MACROS ****************/
 #define IMAGE_WIDTH 960
 #define IMAGE_HEIGHT 960
-
 #define COLOR_DEPTH (5)
-
 #define MAX_SLAVES  (IMAGE_WIDTH)
 
-unsigned int num_slaves, num_proc;
+/************* GLOBAL VARS *************/
+unsigned int num_slaves, num_proc; // mpi num processes and slaves
+static tipoMapa miMapa; // image map
+typedef enum {zoomIn, zoomOut, noZoom} t_zoom; // Zoom info
 
-static tipoMapa miMapa;
-
-typedef enum {zoomIn, zoomOut, noZoom} t_zoom;
-
+// Theorical image coords
 static double _height =  0.000305;
 static double _x_center  = -0.813997;
 static double _y_center  =  0.194129;
 
+/**
+* slave
+* MPI slave proccess.
+**/
 void slave(void){
     short row, column, params[3];
     unsigned int *colours;
@@ -34,16 +44,19 @@ void slave(void){
     t_zoom zoom;
     MPI_Status status;
 
+    // Init image
     mapiProfundidadColor (COLOR_DEPTH);
-
     GPU_mandelInit (mapiNumColoresDefinidos(), IMAGE_WIDTH, IMAGE_HEIGHT, num_slaves, num_proc - 1);
     planoMapear(IMAGE_WIDTH, IMAGE_HEIGHT, _x_center, _y_center, _height);
 
+    // Receive parameters from master
     MPI_Bcast(&params, 3, MPI_SHORT, 0, MPI_COMM_WORLD);
-    while(params[0] != -1){
+    while(params[0] != -1){  // Check if finished
         row = params[0];
         column = params[1];
         zoom = params[2];
+
+        // Image coords to real coords
         planoPixelAPunto(row, column, &_x_center, &_y_center);
         switch(zoom){
             case zoomIn: _height = _height / 2.0; break;
@@ -52,18 +65,23 @@ void slave(void){
         }
         planoMapear(IMAGE_WIDTH, IMAGE_HEIGHT, _x_center, _y_center, _height);
         assert (gettimeofday(&t0, NULL) == 0);
-        int num_items = process_mandelbrot(&colours);
+        int num_items = process_mandelbrot(&colours);  // Send process to GPU
         assert (gettimeofday(&t1, NULL) == 0);
-        MPI_Send(colours, 0 /*num_items*/, MPI_INT, 0, 0, MPI_COMM_WORLD);
+        MPI_Send(colours, 0 /*num_items*/, MPI_INT, 0, 0, MPI_COMM_WORLD); // Send result to master
         timersub(&t1, &t0, &t);
         printf("Finished proccess of machine %d in %ld:%ld (seg:mseg)\n", num_proc, t.tv_sec, t.tv_usec/1000);
-        MPI_Bcast(&params, 3, MPI_SHORT, 0, MPI_COMM_WORLD);
+        MPI_Bcast(&params, 3, MPI_SHORT, 0, MPI_COMM_WORLD); // Receive new parameters from master
     }
+    // Deinit GPU
     GPU_finalize();
     MPI_Finalize();
     exit(0);
 }
 
+/**
+* end_evt
+* Close window event
+*/
 void end_evt(void){
     short params[3];
     params[0] = -1;
@@ -72,6 +90,11 @@ void end_evt(void){
     exit(0);
 }
 
+/**
+* draw
+* draw event on master process
+* called by GTK window evt.
+*/
 void draw(short row, short column, short zoom){
     short actual_row = 0;
     short params[3];
@@ -83,8 +106,10 @@ void draw(short row, short column, short zoom){
     params[1] = column;
     params[2] = zoom;
 
+    // Send draw parameters to slaves
     MPI_Bcast(params, 3, MPI_SHORT, 0, MPI_COMM_WORLD);
 
+    // Number of rows per slave
     int num_rows = (IMAGE_HEIGHT / num_slaves);
     int row_colours[num_rows * IMAGE_WIDTH];
     int slaves_sended = 0;
@@ -104,10 +129,15 @@ void draw(short row, short column, short zoom){
     }
     assert (gettimeofday(&t1, NULL) == 0);
     timersub(&t1, &t0, &t);
+    // Draw complete image to screen
     mapiDibujarMapa(&miMapa);
     printf("Tiempo => %ld:%ld (seg:mseg)\n", t.tv_sec, t.tv_usec/1000);
 }
 
+/**
+* click_evt
+* GTK window click event handler
+*/
 void click_evt(short row, short column, int left_btn){
     t_zoom zoom;
     if(left_btn) zoom = zoomIn;
@@ -115,6 +145,9 @@ void click_evt(short row, short column, int left_btn){
     draw(row, column, zoom);
 }
 
+/**
+* GTK button event handler
+*/
 void btn_evt() {
     t_zoom zoom = noZoom;
     draw(IMAGE_WIDTH / 2, IMAGE_HEIGHT / 2, zoom);
@@ -126,11 +159,13 @@ int main(int argc, char **argv){
     unsigned char hostname[200];
     unsigned int len;
 
+    // Init MPI cluster
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &num_slaves);
     MPI_Get_processor_name(hostname, &len);
     num_slaves--;
 
+    // Init image
     miMapa.elColor  = colorRGB;
     miMapa.filas    = IMAGE_HEIGHT;
     miMapa.columnas = IMAGE_WIDTH;
@@ -147,6 +182,7 @@ int main(int argc, char **argv){
 
     if(!num_proc){
         mapiProfundidadColor(COLOR_DEPTH);
+        // init window on master process
         mapiInicializar(IMAGE_WIDTH, IMAGE_HEIGHT, btn_evt, click_evt,end_evt);
     }else{
         slave();
